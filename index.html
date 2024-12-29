@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=\, initial-scale=1.0">
+
+    <link rel="stylesheet" href="styles.css">
+    <title>Christmas Jeopardy</title>
+</head>
+
+<body>
+    <section id="starting-screen">
+        <img class="jeopardy-logo" src="jeopardy-logo.png" alt="jeopardy logo">
+        <h2 class="topic-name">Random</h2>
+        <button id="start-game-btn">Start Game</button>
+    </section>
+
+    <main id="app">
+        <div id="game-board-header-container">
+            <h2 class="game-board-header">Game Board</h2>
+            <button id="final-jeopardy-btn">Final Jeopardy</button>
+        </div>
+
+        <div id="game-board">
+            <span class="red-line"></span>
+            <div class="category-column" id="category-1">
+                <div class="category-header">Sciency Smart Stuff</div>
+                <button class="prblm-btn">200</button>
+                <button class="prblm-btn">400</button>
+                <button class="prblm-btn">600</button>
+                <button class="prblm-btn">800</button>
+                <button class="prblm-btn">1000</button>
+            </div>
+            <span class="red-line"></span>
+            <div class="category-column" id="category-2">
+                <div class="category-header">Countries and Capitals</div>
+                <button class="prblm-btn">200</button>
+                <button class="prblm-btn">400</button>
+                <button class="prblm-btn">600</button>
+                <button class="prblm-btn">800</button>
+                <button class="prblm-btn">1000</button>
+            </div>
+            <span class="red-line"></span>
+            <div class="category-column" id="category-3">
+                <div class="category-header">Do you know Disney?</div>
+                <button class="prblm-btn">200</button>
+                <button class="prblm-btn">400</button>
+                <button class="prblm-btn">600</button>
+                <button class="prblm-btn">800</button>
+                <button class="prblm-btn">1000</button>
+            </div>
+            <span class="red-line"></span>
+            <div class="category-column" id="category-4">
+                <div class="category-header">Knights and Nobles</div>
+                <button class="prblm-btn">200</button>
+                <button class="prblm-btn">400</button>
+                <button class="prblm-btn">600</button>
+                <button class="prblm-btn">800</button>
+                <button class="prblm-btn">1000</button>
+            </div>
+            <span class="red-line"></span>
+            <div class="category-column" id="category-5">
+                <div class="category-header">Techy Talks</div>
+                <button class="prblm-btn">200</button>
+                <button class="prblm-btn">400</button>
+                <button class="prblm-btn">600</button>
+                <button class="prblm-btn">800</button>
+                <button class="prblm-btn">1000</button>
+            </div>
+            <span class="red-line"></span>
+            <div class="category-column" id="category-6">
+                <div class="category-header">Presidential Matters</div>
+                <button class="prblm-btn">200</button>
+                <button class="prblm-btn">400</button>
+                <button class="prblm-btn">600</button>
+                <button class="prblm-btn">800</button>
+                <button class="prblm-btn">1000</button>
+            </div>
+            <span class="red-line"></span>
+        </div>
+
+        <aside id="contestent-points">
+            <div id="current-player"></div>
+            <div id="player-points"></div>
+        </aside>
+
+        <div id="question-answer">
+            <div id="question-header">
+                <h2 id="q-category"></h2>
+                <h2 id="q-difficulty"></h2>
+                <h2 id="timer">00:30</h2>
+            </div>
+            <p id="question-answer-txt"></p>
+            <button id="next-btn"></button>
+        </div>
+    </main>
+
+    <section id="end-screen">
+        <div id="winner-container"></div>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
