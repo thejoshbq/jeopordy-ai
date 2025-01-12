@@ -3,20 +3,49 @@ let cl = console.log;
 // === DOM Elements ===
 const startingSreen = document.getElementById("starting-screen");
 const mainApp = document.getElementById("app");
-let problemButton = document.querySelectorAll(".prblm-btn");
+const problemButton = document.querySelectorAll(".prblm-btn");
 const popUp = document.getElementById("question-answer");
-let qCategory = document.getElementById("q-category");
-let qDifficulty = document.getElementById("q-difficulty");
-let problemTxt = document.getElementById("question-answer-txt");
-let popUpNextBtn = document.getElementById("next-btn");
+const qCategory = document.getElementById("q-category");
+const qDifficulty = document.getElementById("q-difficulty");
+const problemTxt = document.getElementById("question-answer-txt");
+const popUpNextBtn = document.getElementById("next-btn");
+const categoryHeaders = document.querySelectorAll(".category-header");
 // === function to start game btn ===
 document
   .getElementById("start-game-btn")
   .addEventListener("click", function () {
     startingSreen.style.display = "none";
     mainApp.style.display = "grid";
+
+    getCategoryHeaders();
   });
 
+// === function to fill category headers with category names ===
+let headerArray = [];
+let categoryNames = [];
+function getCategoryHeaders() {
+  categoryHeaders.forEach((header) => {
+    headerArray.push(header);
+  });
+  for (let i = 0; i < headerArray.length; i++) {}
+
+  fetch("../other-questions.json")
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      for (let i = 0; i < data["category-names"].length; i++) {
+        categoryNames.push(data["category-names"][i]);
+        cl(categoryNames);
+      }
+    })
+    .catch((error) => {
+      console.error("There was a problem with the fetch operation:", error);
+    });
+}
 // === function for each problem button ===
 
 let userCategoryChoice = "";
@@ -38,7 +67,7 @@ function showQuestion() {
   popUp.style.display = "block";
   qDifficulty.innerHTML = `$${userDifficultyChoice}`;
 
-  fetch("jeopardy-questions.json")
+  fetch("../other-questions.json")
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -62,7 +91,7 @@ function showQuestion() {
   startCountdown(30);
 }
 function showAnswer() {
-  fetch("jeopardy-questions.json")
+  fetch("../other-questions.json")
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -218,7 +247,7 @@ function finalJeopardy() {
   popUp.style.display = "block";
   qCategory.innerHTML = "FINAL JEOPARDY";
   qDifficulty.innerHTML = "";
-  fetch("jeopardy-questions.json")
+  fetch("../other-questions.json")
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -242,7 +271,7 @@ function finalJeopardy() {
 }
 
 function showFinalAnswer() {
-  fetch("jeopardy-questions.json")
+  fetch("../other-questions.json")
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
