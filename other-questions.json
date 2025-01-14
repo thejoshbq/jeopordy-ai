@@ -4,7 +4,7 @@
         "category-1": "Musicals",
         "category-2": "Finish the...",
         "category-3": "The Animal Kingdom",
-        "category-4": "The Age of Enlightenment",
+        "category-4": "Renaissance",
         "category-5": "Biology",
         "category-6": "Superheros"
     },
@@ -144,7 +144,7 @@
 
     "final-jeopardy": {
         "question": "This Roman emperor's last words were \"Et tu, Brute?\"",
-        "answer": "What is the emu?"
+        "answer": "Who is Julius Caesar?"
     }
   }
    

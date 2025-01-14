@@ -2,14 +2,27 @@ let cl = console.log;
 
 // === DOM Elements ===
 const startingSreen = document.getElementById("starting-screen");
-const mainApp = document.getElementById("app");
-const problemButton = document.querySelectorAll(".prblm-btn");
-const popUp = document.getElementById("question-answer");
-const qCategory = document.getElementById("q-category");
-const qDifficulty = document.getElementById("q-difficulty");
-const problemTxt = document.getElementById("question-answer-txt");
-const popUpNextBtn = document.getElementById("next-btn");
-const categoryHeaders = document.querySelectorAll(".category-header");
+let mainApp = document.getElementById("app");
+let problemButton = document.querySelectorAll(".prblm-btn");
+let popUp = document.getElementById("question-answer");
+let qCategory = document.getElementById("q-category");
+let qDifficulty = document.getElementById("q-difficulty");
+let problemTxt = document.getElementById("question-answer-txt");
+let popUpNextBtn = document.getElementById("next-btn");
+
+let playerPointsContainer = document.getElementById("player-points");
+
+// === Variables ===
+let players = ["Team 1", "Team 2", "Team 3", "Team 4", "Team 5", "Team 6"];
+let currentPlayerIndex = 0;
+let currentPlayerTurn = players[currentPlayerIndex];
+
+let userCategoryChoice = "";
+let userDifficultyChoice = "";
+
+let winnerScore = "";
+let winner = "";
+let winners = [];
 // === function to start game btn ===
 document
   .getElementById("start-game-btn")
@@ -17,17 +30,12 @@ document
     startingSreen.style.display = "none";
     mainApp.style.display = "grid";
 
-    getCategoryHeaders();
+    populateCategoryHeaders();
   });
 
-// === function to fill category headers with category names ===
-let headerArray = [];
-let categoryNames = [];
-function getCategoryHeaders() {
-  categoryHeaders.forEach((header) => {
-    headerArray.push(header);
-  });
-  for (let i = 0; i < headerArray.length; i++) {}
+// function to populate category headers with category names
+function populateCategoryHeaders() {
+  let categoryNames = [];
 
   fetch("../other-questions.json")
     .then((response) => {
@@ -37,19 +45,21 @@ function getCategoryHeaders() {
       return response.json();
     })
     .then((data) => {
-      for (let i = 0; i < data["category-names"].length; i++) {
-        categoryNames.push(data["category-names"][i]);
-        cl(categoryNames);
+      for (let i = 0; i < 6; i++) {
+        categoryNames.push(data["category-names"][`category-${i + 1}`]);
+      }
+      for (let i = 0; i < categoryNames.length; i++) {
+        document.getElementById(
+          `header-${i + 1}`
+        ).innerHTML = `${categoryNames[i]}`;
       }
     })
     .catch((error) => {
-      console.error("There was a problem with the fetch operation:", error);
+      console.error("Error fetching the JSON file:", error);
     });
 }
-// === function for each problem button ===
 
-let userCategoryChoice = "";
-let userDifficultyChoice = "";
+// === function for each problem button ===
 
 problemButton.forEach((button) => {
   button.addEventListener("click", function () {
@@ -115,11 +125,7 @@ function showAnswer() {
   });
 }
 
-let players = ["Team 1", "Team 2", "Team 3", "Team 4", "Team 5", "Team 6"];
-
 // ===== update next player =====
-let currentPlayerIndex = 0;
-let currentPlayerTurn = players[currentPlayerIndex];
 
 document.getElementById(
   "current-player"
@@ -133,7 +139,6 @@ function nextPlayer() {
   ).innerHTML = `Current player is: <br> <span>${currentPlayerTurn}</span>`;
 }
 
-let playerPointsContainer = document.getElementById("player-points");
 function displayPlayers() {
   playerPointsContainer.innerHTML = "";
 
@@ -345,9 +350,7 @@ function finalUserScore() {
     calculateWinner();
   });
 }
-let winnerScore = "";
-let winner = "";
-let winners = [];
+
 function calculateWinner() {
   let playerFinalScore = document.querySelectorAll(".user-point");
   let winnerScore = 0;
