@@ -80,15 +80,26 @@
         </div>
 
         <aside id="contestent-points">
-            <div id="current-player"></div>
-            <div id="player-points"></div>
+            <!-- <div id="current-player"></div> -->
+            <div id="player-points">
+                <!-- <div class="user-points">
+                    <div class="player-name-container">
+                        <input class="player-name-input" type="text" placeholder="${players[i]}:">
+                        <div class="player-name-display"></div>
+                    </div>
+                    <span class="user-point">0</span>
+                    <button class="delete-player">×</button>
+                </div> -->
+            </div>
         </aside>
 
         <div id="question-answer">
             <div id="question-header">
                 <h2 id="q-category"></h2>
                 <h2 id="q-difficulty"></h2>
-                <h2 id="timer">00:30</h2>
+                <div id="timer-wrapper">
+                    <div id="timer-bar"></div>
+                </div>
             </div>
             <p id="question-answer-txt"></p>
             <button id="next-btn"></button>

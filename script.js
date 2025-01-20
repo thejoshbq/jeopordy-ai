@@ -37,7 +37,7 @@ document
 function populateCategoryHeaders() {
   let categoryNames = [];
 
-  fetch("../other-questions.json")
+  fetch("../questions/other-questions.json")
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -77,7 +77,7 @@ function showQuestion() {
   popUp.style.display = "block";
   qDifficulty.innerHTML = `$${userDifficultyChoice}`;
 
-  fetch("../other-questions.json")
+  fetch("../questions/other-questions.json")
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -101,7 +101,7 @@ function showQuestion() {
   startCountdown(30);
 }
 function showAnswer() {
-  fetch("../other-questions.json")
+  fetch("../questions/other-questions.json")
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -127,17 +127,17 @@ function showAnswer() {
 
 // ===== update next player =====
 
-document.getElementById(
-  "current-player"
-).innerHTML = `Current player is: <br> <span>${currentPlayerTurn}</span>`;
+// document.getElementById(
+//   "current-player"
+// ).innerHTML = `Current player is: <br> <span>${currentPlayerTurn}</span>`;
 
-function nextPlayer() {
-  currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
-  currentPlayerTurn = players[currentPlayerIndex];
-  document.getElementById(
-    "current-player"
-  ).innerHTML = `Current player is: <br> <span>${currentPlayerTurn}</span>`;
-}
+// function nextPlayer() {
+//   currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+//   currentPlayerTurn = players[currentPlayerIndex];
+//   document.getElementById(
+//     "current-player"
+//   ).innerHTML = `Current player is: <br> <span>${currentPlayerTurn}</span>`;
+// }
 
 function displayPlayers() {
   playerPointsContainer.innerHTML = "";
@@ -218,27 +218,30 @@ userPoints.forEach((point) => {
 // ===== TIMER =====
 
 function startCountdown(countdownTime) {
-  const timerElement = document.getElementById("timer");
+  // const timerElement = document.getElementById("timer");
+  const timerBar = document.getElementById("timer-bar");
 
   const interval = setInterval(() => {
-    timerElement.classList.add("scaled");
-    setTimeout(() => {
-      timerElement.classList.remove("scaled");
-    }, 200);
+    // timerElement.classList.add("scaled");
+    // setTimeout(() => {
+    //   timerElement.classList.remove("scaled");
+    // }, 200);
 
-    const minutes = Math.floor(countdownTime / 60);
-    const seconds = countdownTime % 60;
+    // const minutes = Math.floor(countdownTime / 60);
+    // const seconds = countdownTime % 60;
 
-    const formattedTime = `${String(minutes).padStart(2, "0")}:${String(
-      seconds
-    ).padStart(2, "0")}`;
-    timerElement.textContent = formattedTime;
+    // const formattedTime = `${String(minutes).padStart(2, "0")}:${String(
+    //   seconds
+    // ).padStart(2, "0")}`;
+    // timerElement.textContent = formattedTime;
+    timerBar.style.width = `${(countdownTime / 30) * 100}%`;
 
     countdownTime--;
 
     if (countdownTime < 0 || popUp.style.display === "none") {
       clearInterval(interval);
-      timerElement.textContent = "00:30";
+      // timerElement.textContent = "00:30";
+      timerBar.style.width = `100%`;
     }
   }, 1000);
 }
@@ -252,7 +255,7 @@ function finalJeopardy() {
   popUp.style.display = "block";
   qCategory.innerHTML = "FINAL JEOPARDY";
   qDifficulty.innerHTML = "";
-  fetch("../other-questions.json")
+  fetch("../questions/other-questions.json")
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -276,7 +279,7 @@ function finalJeopardy() {
 }
 
 function showFinalAnswer() {
-  fetch("../other-questions.json")
+  fetch("../questions/other-questions.json")
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
