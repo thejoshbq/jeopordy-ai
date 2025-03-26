@@ -244,22 +244,14 @@ aside {
     flex-direction: column;
     align-items: center;
     justify-content: space-around;
-    height: 100%;
+    height: 85%;
     width: 100%;
 }
 
-
-
 .user-points {
-    /* margin-top: 5.5rem; */
     position: relative;
     width: 100%;
 }
-
-/* #player-points> :first-child {
-    margin-top: 2.5rem;
-} */
-
 
 .user-points .player-name-container input[type="text"], .player-name-display {
     font-weight: 600;
@@ -271,10 +263,6 @@ aside {
     outline: none;
     display: flex;
     flex-wrap: wrap;
-    /* position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    left: 0; */
 }
 
 .user-points .player-name-container input[type="text"]::placeholder {
@@ -291,7 +279,7 @@ aside {
     margin-top: auto;
 }
 
-/* #current-player {
+#current-player {
     font-size: 2rem;
     font-weight: 600;
     text-align: center;
@@ -301,7 +289,7 @@ aside {
 #current-player span {
     color: rgb(255, 208, 0);
     font-size: 2.5rem;
-} */
+}
 
 .user-point {
     color: rgb(255, 208, 0);
@@ -337,8 +325,6 @@ aside {
 
 /* === Timer === */
 
-
-
 #timer {
     transition: all 0.2s ease;
 }
@@ -362,6 +348,7 @@ aside {
     background-color: yellow;
     border-radius: inherit;
     width: 100%;
+    transition: all 0.5s linear;
 }
 
 

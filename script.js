@@ -10,7 +10,7 @@ let qDifficulty = document.getElementById("q-difficulty");
 let problemTxt = document.getElementById("question-answer-txt");
 let popUpNextBtn = document.getElementById("next-btn");
 
-let playerPointsContainer = document.getElementById("player-points");
+const playerPointsContainer = document.getElementById("player-points");
 
 // === Variables ===
 let players = ["Team 1", "Team 2", "Team 3", "Team 4", "Team 5", "Team 6"];
@@ -37,7 +37,7 @@ document
 function populateCategoryHeaders() {
   let categoryNames = [];
 
-  fetch("../questions/other-questions.json")
+  fetch("../questions/annah-questions.json")
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -77,7 +77,7 @@ function showQuestion() {
   popUp.style.display = "block";
   qDifficulty.innerHTML = `$${userDifficultyChoice}`;
 
-  fetch("../questions/other-questions.json")
+  fetch("../questions/annah-questions.json")
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -101,7 +101,7 @@ function showQuestion() {
   startCountdown(30);
 }
 function showAnswer() {
-  fetch("../questions/other-questions.json")
+  fetch("../questions/annah-questions.json")
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -127,17 +127,17 @@ function showAnswer() {
 
 // ===== update next player =====
 
-// document.getElementById(
-//   "current-player"
-// ).innerHTML = `Current player is: <br> <span>${currentPlayerTurn}</span>`;
+document.getElementById(
+  "current-player"
+).innerHTML = `Current player is: <br> <span>${currentPlayerTurn}</span>`;
 
-// function nextPlayer() {
-//   currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
-//   currentPlayerTurn = players[currentPlayerIndex];
-//   document.getElementById(
-//     "current-player"
-//   ).innerHTML = `Current player is: <br> <span>${currentPlayerTurn}</span>`;
-// }
+function nextPlayer() {
+  currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+  currentPlayerTurn = players[currentPlayerIndex];
+  document.getElementById(
+    "current-player"
+  ).innerHTML = `Current player is: <br> <span>${currentPlayerTurn}</span>`;
+}
 
 function displayPlayers() {
   playerPointsContainer.innerHTML = "";
@@ -145,7 +145,7 @@ function displayPlayers() {
   for (let i = 0; i < players.length; i++) {
     playerPointsContainer.innerHTML += `<div class="user-points"> 
                   <div class="player-name-container">
-                      <input class="player-name-input" type="text" placeholder="${players[i]}:">
+                      <input class="player-name-input" type="text" placeholder="${players[i]}:" autocomplete="off">
                       <div class="player-name-display"></div>
                   </div>
                   <span class="user-point">0</span>
@@ -175,7 +175,6 @@ playerNameInput.forEach((input) => {
   input.addEventListener("keydown", function (event) {
     if (event.key === "Enter") {
       input.nextElementSibling.innerHTML = input.value + ":";
-      input.placeholder = "";
 
       let i = playersArray.indexOf(input.parentElement.parentElement);
       players[i] = input.value;
@@ -183,7 +182,7 @@ playerNameInput.forEach((input) => {
       document.getElementById(
         "current-player"
       ).innerHTML = `Current player is: <br> <span>${players[0]}</span>`;
-      input.value = "";
+      input.style.display = "none";
     }
   });
 });
@@ -235,15 +234,16 @@ function startCountdown(countdownTime) {
     // ).padStart(2, "0")}`;
     // timerElement.textContent = formattedTime;
     timerBar.style.width = `${(countdownTime / 30) * 100}%`;
+    // cl(`${(countdownTime / 30) * 100}%`);
 
-    countdownTime--;
+    countdownTime = countdownTime -= 0.005;
 
     if (countdownTime < 0 || popUp.style.display === "none") {
       clearInterval(interval);
       // timerElement.textContent = "00:30";
       timerBar.style.width = `100%`;
     }
-  }, 1000);
+  }, 5);
 }
 
 // ===== FINAL JEOPARDY =====
@@ -255,7 +255,7 @@ function finalJeopardy() {
   popUp.style.display = "block";
   qCategory.innerHTML = "FINAL JEOPARDY";
   qDifficulty.innerHTML = "";
-  fetch("../questions/other-questions.json")
+  fetch("../questions/annah-questions.json")
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -272,14 +272,14 @@ function finalJeopardy() {
   popUpNextBtn.replaceWith(popUpNextBtn.cloneNode(true));
   popUpNextBtn = document.getElementById("next-btn");
   popUpNextBtn.addEventListener("click", showFinalAnswer);
-  document.getElementById("timer").innerText = "01:00";
-  startCountdown(60);
+  // document.getElementById("timer").innerText = "01:00";
+  startCountdown(30);
 
   finalUserScore();
 }
 
 function showFinalAnswer() {
-  fetch("../questions/other-questions.json")
+  fetch("../questions/annah-questions.json")
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
