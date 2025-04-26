@@ -11,7 +11,10 @@
         <h1>Jeopardy Setup</h1>
         <form id="setup-form">
             <label for="api-key">Together.ai API Key:</label>
-            <input type="text" id="api-key" placeholder="Enter your API key" required>
+            <div class="password-container">
+                <input type="password" id="api-key" placeholder="Enter your API key" required>
+                <button type="button" id="toggle-api-key" class="toggle-password">Show</button>
+            </div>
             <label for="topics">Topics (comma-separated, at least 4):</label>
             <input type="text" id="topics" placeholder="e.g., History, Science, Pop Culture, Sports" required>
             <label for="tonality">Tonality:</label>
@@ -40,6 +43,7 @@
         </form>
         <p id="error-message" style="display: none; color: red;"></p>
     </div>
+    <!-- Rest of the HTML remains unchanged -->
     <div id="starting-screen" style="display: none;">
         <img src="assets/jeopardy-logo.png" alt="Jeopardy Logo">
         <p>Questions have been generated. Click below to start the game.</p>
