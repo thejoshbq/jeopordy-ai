@@ -23,7 +23,7 @@ let currentEntityTurn = null;
 let userCategoryChoice = "";
 let userDifficultyChoice = "";
 let questionsData = null;
-let gameId = Date.now().toString(); // Simple client-side game ID
+let gameId = Date.now().toString();
 let gameMode = 'team';
 let answeredQuestions = 0;
 const totalQuestions = 20;
@@ -100,6 +100,17 @@ document.addEventListener("click", (e) => {
         document.querySelectorAll(".player-name-input").forEach((input, i) => {
             input.placeholder = `Player ${i + 1} Name`;
         });
+    } else if (e.target.id === "toggle-api-key") {
+        console.log("Toggling API key visibility");
+        const apiKeyInput = document.getElementById("api-key");
+        const toggleButton = e.target;
+        if (apiKeyInput.type === "password") {
+            apiKeyInput.type = "text";
+            toggleButton.textContent = "Hide";
+        } else {
+            apiKeyInput.type = "password";
+            toggleButton.textContent = "Show";
+        }
     }
 });
 
@@ -193,101 +204,95 @@ function resetButtonState() {
     isGeneratingQuestions = false;
 }
 
-// Function to find valid JSON in the response
+// findValidJson function
 function findValidJson(content, expectedType = 'array') {
     console.log('Searching for valid JSON in response:', content);
-    // Try common code fences first
-    let jsonMatch = content.match(/```(?:json)?\n([\s\S]*?)\n```/) || content.match(/'''(?:json)?\n([\s\S]*?)\n'''/);
-    if (jsonMatch) {
+
+    // Helper function to attempt JSON parsing safely
+    const tryParseJson = (str) => {
         try {
-            const json = JSON.parse(jsonMatch[1].trim());
+            const json = JSON.parse(str.trim());
             if (expectedType === 'array' && Array.isArray(json) && json.length === 4) {
-                console.log('Found valid JSON in code fences:', json);
+                console.log('Found valid JSON array:', json);
                 return json;
             } else if (expectedType === 'object' && !Array.isArray(json) && typeof json === 'object') {
-                console.log('Found valid JSON in code fences:', json);
+                console.log('Found valid JSON object:', json);
                 return json;
             }
         } catch (e) {
-            console.error('Error parsing JSON from code fences:', e);
+            console.error('JSON parse error:', e.message);
+            return null;
+        }
+        return null;
+    };
+
+    // Try common code fences
+    const codeFenceRegexes = [
+        /```(?:json)?\n([\s\S]*?)\n```/,
+        /'''(?:json)?\n([\s\S]*?)\n'''/,
+        /```\n([\s\S]*?)\n```/, // Fallback for plain code fences
+    ];
+    for (const regex of codeFenceRegexes) {
+        const match = content.match(regex);
+        if (match) {
+            const json = tryParseJson(match[1]);
+            if (json) return json;
         }
     }
 
-    // Search for any valid JSON object or array
+    // Clean up common issues (e.g., trailing commas, unclosed brackets)
+    let cleanedContent = content
+        .replace(/,\s*([\]}])/g, '$1') // Remove trailing commas
+        .replace(/[\n\r]+/g, '') // Remove newlines
+        .trim();
+
+    // Search for valid JSON object or array
     const stack = [];
     let startIndex = -1;
-    for (let i = 0; i < content.length; i++) {
-        if (content[i] === '{' || content[i] === '[') {
+    for (let i = 0; i < cleanedContent.length; i++) {
+        if (cleanedContent[i] === '{' || cleanedContent[i] === '[') {
             if (stack.length === 0) startIndex = i;
-            stack.push(content[i]);
-        } else if (content[i] === '}' && stack[stack.length - 1] === '{') {
+            stack.push(cleanedContent[i]);
+        } else if (cleanedContent[i] === '}' && stack[stack.length - 1] === '{') {
             stack.pop();
             if (stack.length === 0) {
-                const potentialJson = content.slice(startIndex, i + 1);
-                try {
-                    const json = JSON.parse(potentialJson);
-                    if (expectedType === 'array' && Array.isArray(json) && json.length === 4) {
-                        console.log('Found valid JSON array:', json);
-                        return json;
-                    } else if (expectedType === 'object' && !Array.isArray(json) && typeof json === 'object') {
-                        console.log('Found valid JSON object:', json);
-                        return json;
-                    }
-                } catch (e) {
-                    // Continue searching
-                }
+                const potentialJson = cleanedContent.slice(startIndex, i + 1);
+                const json = tryParseJson(potentialJson);
+                if (json) return json;
             }
-        } else if (content[i] === ']' && stack[stack.length - 1] === '[') {
+        } else if (cleanedContent[i] === ']' && stack[stack.length - 1] === '[') {
             stack.pop();
             if (stack.length === 0) {
-                const potentialJson = content.slice(startIndex, i + 1);
-                try {
-                    const json = JSON.parse(potentialJson);
-                    if (expectedType === 'array' && Array.isArray(json) && json.length === 4) {
-                        console.log('Found valid JSON array:', json);
-                        return json;
-                    } else if (expectedType === 'object' && !Array.isArray(json) && typeof json === 'object') {
-                        console.log('Found valid JSON object:', json);
-                        return json;
-                    }
-                } catch (e) {
-                    // Continue searching
-                }
+                const potentialJson = cleanedContent.slice(startIndex, i + 1);
+                const json = tryParseJson(potentialJson);
+                if (json) return json;
             }
         }
     }
 
-    // Try parsing the entire content as a last resort
-    try {
-        const json = JSON.parse(content.trim());
-        if (expectedType === 'array' && Array.isArray(json) && json.length === 4) {
-            console.log('Found valid JSON in entire content:', json);
-            return json;
-        } else if (expectedType === 'object' && !Array.isArray(json) && typeof json === 'object') {
-            console.log('Found valid JSON in entire content:', json);
-            return json;
-        }
-    } catch (e) {
-        console.error('Error parsing entire content as JSON:', e);
-    }
+    // Try parsing the entire cleaned content as a last resort
+    const json = tryParseJson(cleanedContent);
+    if (json) return json;
 
     throw new Error('No valid JSON found in response');
 }
 
-// Together.ai API Integration
+// generateQuestions function
 async function generateQuestions(topics, tonality, mode) {
     const prompt = `
-        Generate a JSON object for a Jeopardy game with exactly 4 categories. Each category should have a unique name based on one of the provided topics: ${topics.join(', ')}. Each category must contain exactly 5 questions with point values 200, 400, 600, 800, and 1000. Each question must include:
-        - "value": the point value (200, 400, 600, 800, 1000)
-        - "question": the question text
-        - "answer": the answer text
-        The questions should be written in a ${tonality} tone and suitable for a ${mode === 'team' ? 'team-based' : 'individual'} game. Ensure questions are clear, concise, and appropriate for a general audience. Return only the JSON object, nothing else.
-        Example format:
+        You are a JSON generator for a Jeopardy game. Return *only* a valid JSON array containing exactly 4 categories. Each category must be an object with:
+        - "name": a unique category name based on one of these topics: ${topics.join(', ')}
+        - "questions": an array of exactly 5 questions, each with:
+          - "value": a point value (200, 400, 600, 800, 1000)
+          - "question": the question text (clear, concise, in a ${tonality} tone)
+          - "answer": the answer text
+        The questions must be suitable for a ${mode === 'team' ? 'team-based' : 'individual'} game and appropriate for a general audience. Do not include any text, markdown, or code fences outside the JSON array. Ensure the JSON is complete and valid.
+        Example:
         [
             {
-                "name": "Category Name",
+                "name": "History",
                 "questions": [
-                    { "value": 200, "question": "Question text", "answer": "Answer text" },
+                    { "value": 200, "question": "This war lasted from 1939 to 1945.", "answer": "World War II" },
                     ...
                 ]
             },
@@ -305,8 +310,8 @@ async function generateQuestions(topics, tonality, mode) {
             body: JSON.stringify({
                 model: "meta-llama/Llama-3-8b-chat-hf",
                 messages: [{ role: "user", content: prompt }],
-                max_tokens: 2048,
-                temperature: 0.7
+                max_tokens: 4096,
+                temperature: 0.5
             })
         });
 
@@ -319,24 +324,29 @@ async function generateQuestions(topics, tonality, mode) {
         console.log('Raw API response:', content);
 
         const questions = findValidJson(content, 'array');
+        if (!questions.every(cat => cat.name && Array.isArray(cat.questions) && cat.questions.length === 5)) {
+            throw new Error('Invalid question structure: Each category must have a name and 5 questions.');
+        }
         return questions;
     } catch (error) {
+        console.error('Generate questions error:', error);
         throw new Error(`Failed to generate questions: ${error.message}`);
     }
 }
 
+// generateFinalJeopardy function
 async function generateFinalJeopardy(topics) {
     const prompt = `
-        Generate a JSON object for a Final Jeopardy question. The category should be one of the provided topics: ${topics.join(', ')}. The object must include:
-        - "category": the category name
-        - "question": the question text
+        You are a JSON generator for a Jeopardy game. Return *only* a valid JSON object for a Final Jeopardy question. The object must include:
+        - "category": a category name based on one of these topics: ${topics.join(', ')}
+        - "question": the question text (challenging, in a ${document.getElementById("tonality").value} tone)
         - "answer": the answer text
-        The question should be challenging, suitable for a final round, and written in a ${document.getElementById("tonality").value} tone. Return only the JSON object, nothing else.
-        Example format:
+        The question must be suitable for a final round and a general audience. Do not include any text, markdown, or code fences outside the JSON object. Ensure the JSON is complete and valid.
+        Example:
         {
-            "category": "Category Name",
-            "question": "Question text",
-            "answer": "Answer text"
+            "category": "History",
+            "question": "This leader was assassinated in 1963.",
+            "answer": "John F. Kennedy"
         }
     `;
 
@@ -351,7 +361,7 @@ async function generateFinalJeopardy(topics) {
                 model: "meta-llama/Llama-3-8b-chat-hf",
                 messages: [{ role: "user", content: prompt }],
                 max_tokens: 512,
-                temperature: 0.7
+                temperature: 0.5
             })
         });
 
@@ -516,6 +526,111 @@ function startCountdown(countdownTime) {
         }
     }, 5);
 }
+
+// Final Jeopardy Handling with Wagering
+finalJeopardyBtn.addEventListener("click", async () => {
+    console.log("Final Jeopardy button clicked");
+    finalJeopardyBtn.disabled = true; // Prevent multiple clicks
+    mainApp.style.display = "none"; // Hide main game board
+    popUp.style.display = "block"; // Show question popup
+
+    try {
+        // Step 1: Collect wagers
+        qCategory.textContent = "Final Jeopardy";
+        qDifficulty.textContent = "Wagering";
+        problemTxt.innerHTML = `
+            <h3>Enter Wagers</h3>
+            ${entities.map((entity, index) => `
+                <div>
+                    <label>${entity.name} (Score: ${entity.score}): </label>
+                    <input type="number" class="wager-input" data-entity-index="${index}" min="0" max="${entity.score}" value="0" required>
+                </div>
+            `).join('')}
+        `;
+        const pointRecipient = document.getElementById("point-recipient");
+        pointRecipient.style.display = "none"; // Hide recipient dropdown
+        const nextBtn = document.getElementById("next-btn");
+        nextBtn.textContent = "Submit Wagers";
+        nextBtn.onclick = async () => {
+            // Validate and store wagers
+            const wagerInputs = document.querySelectorAll(".wager-input");
+            const wagers = {};
+            let valid = true;
+            wagerInputs.forEach(input => {
+                const index = input.dataset.entityIndex;
+                const wager = parseInt(input.value);
+                const entity = entities[index];
+                if (isNaN(wager) || wager < 0 || wager > entity.score) {
+                    errorMessage.textContent = `Invalid wager for ${entity.name}. Must be between 0 and ${entity.score}.`;
+                    errorMessage.style.display = "block";
+                    valid = false;
+                } else {
+                    wagers[index] = wager;
+                }
+            });
+            if (!valid) return;
+
+            // Step 2: Fetch and display Final Jeopardy question
+            const topics = JSON.parse(localStorage.getItem("questions") || "[]").map(cat => cat.name);
+            const finalQuestion = await generateFinalJeopardy(topics);
+            console.log("Final Jeopardy question:", finalQuestion);
+
+            qCategory.textContent = finalQuestion.category || "Final Jeopardy";
+            qDifficulty.textContent = "Final Jeopardy";
+            problemTxt.textContent = finalQuestion.question || "Error: Question not found.";
+            pointRecipient.style.display = "none";
+            nextBtn.textContent = "See Answer";
+            nextBtn.onclick = () => {
+                // Step 3: Show answer and collect answer correctness
+                problemTxt.textContent = finalQuestion.answer || "Error: Answer not found.";
+                problemTxt.innerHTML += `
+                    <h3>Did each ${gameMode === 'team' ? 'team' : 'player'} answer correctly?</h3>
+                    ${entities.map((entity, index) => `
+                        <div>
+                            <label>${entity.name} (Wager: ${wagers[index]}): </label>
+                            <input type="checkbox" class="correct-answer" data-entity-index="${index}">
+                            <label>Correct</label>
+                        </div>
+                    `).join('')}
+                `;
+                nextBtn.textContent = "Award Points";
+                nextBtn.onclick = () => {
+                    // Step 4: Award points based on wagers and correctness
+                    const correctAnswers = document.querySelectorAll(".correct-answer");
+                    correctAnswers.forEach(checkbox => {
+                        const index = checkbox.dataset.entityIndex;
+                        const entity = entities[index];
+                        const wager = wagers[index];
+                        if (checkbox.checked) {
+                            entity.score += wager; // Add wager for correct answer
+                            console.log(`Awarded ${wager} points to ${entity.name}. New score: ${entity.score}`);
+                        } else {
+                            entity.score -= wager; // Subtract wager for incorrect answer
+                            console.log(`Deducted ${wager} points from ${entity.name}. New score: ${entity.score}`);
+                        }
+                    });
+
+                    // Update display and save game
+                    displayEntities();
+                    saveGame();
+
+                    // Step 5: End the game
+                    popUp.style.display = "none";
+                    showEndScreen();
+                };
+            };
+            startCountdown(60); // Start timer for answering
+        };
+        startCountdown(30); // Timer for wagering
+    } catch (error) {
+        console.error("Error in Final Jeopardy:", error);
+        errorMessage.textContent = `Error: ${error.message}`;
+        errorMessage.style.display = "block";
+        popUp.style.display = "none";
+        mainApp.style.display = "grid";
+        finalJeopardyBtn.disabled = false; // Re-enable button on error
+    }
+});
 
 // End Screen
 function showEndScreen() {
