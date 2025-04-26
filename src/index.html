@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeopardy AI</title>
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+    <div id="setup-screen">
+        <h1>Jeopardy Setup</h1>
+        <form id="setup-form">
+            <label for="api-key">Together.ai API Key:</label>
+            <input type="text" id="api-key" placeholder="Enter your API key" required>
+            <label for="topics">Topics (comma-separated, at least 4):</label>
+            <input type="text" id="topics" placeholder="e.g., History, Science, Pop Culture, Sports" required>
+            <label for="tonality">Tonality:</label>
+            <select id="tonality">
+                <option value="formal">Serious</option>
+                <option value="humorous">Humorous</option>
+                <option value="sarcastic">Sarcastic</option>
+                <option value="dry">Dry</option>
+            </select>
+            <label>Game Mode:</label>
+            <div>
+                <input type="radio" id="team-mode" name="game-mode" value="team" checked>
+                <label for="team-mode">Team</label>
+                <input type="radio" id="free-for-all-mode" name="game-mode" value="free-for-all">
+                <label for="free-for-all-mode">Free-for-All</label>
+            </div>
+            <div id="teams-container">
+                <h3>Teams</h3>
+                <button type="button" id="add-team-btn">Add Team</button>
+            </div>
+            <div id="players-container" style="display: none;">
+                <h3>Players</h3>
+                <button type="button" id="add-player-btn">Add Player</button>
+            </div>
+            <button type="button" id="generate-questions-btn">Generate Questions</button>
+        </form>
+        <p id="error-message" style="display: none; color: red;"></p>
+    </div>
+    <div id="starting-screen" style="display: none;">
+        <img src="assets/jeopardy-logo.png" alt="Jeopardy Logo">
+        <p>Questions have been generated. Click below to start the game.</p>
+        <button id="start-game-btn">Start Game</button>
+    </div>
+    <div id="app" style="display: none;">
+        <img src="assets/jeopardy-logo.png" alt="Jeopardy Logo" id="game-logo">
+        <div id="current-player"></div>
+        <div class="categories">
+            <div class="category" id="category-1">
+                <div class="category-header" id="header-1"></div>
+                <button class="prblm-btn" data-value="200">200</button>
+                <button class="prblm-btn" data-value="400">400</button>
+                <button class="prblm-btn" data-value="600">600</button>
+                <button class="prblm-btn" data-value="800">800</button>
+                <button class="prblm-btn" data-value="1000">1000</button>
+            </div>
+            <div class="category" id="category-2">
+                <div class="category-header" id="header-2"></div>
+                <button class="prblm-btn" data-value="200">200</button>
+                <button class="prblm-btn" data-value="400">400</button>
+                <button class="prblm-btn" data-value="600">600</button>
+                <button class="prblm-btn" data-value="800">800</button>
+                <button class="prblm-btn" data-value="1000">1000</button>
+            </div>
+            <div class="category" id="category-3">
+                <div class="category-header" id="header-3"></div>
+                <button class="prblm-btn" data-value="200">200</button>
+                <button class="prblm-btn" data-value="400">400</button>
+                <button class="prblm-btn" data-value="600">600</button>
+                <button class="prblm-btn" data-value="800">800</button>
+                <button class="prblm-btn" data-value="1000">1000</button>
+            </div>
+            <div class="category" id="category-4">
+                <div class="category-header" id="header-4"></div>
+                <button class="prblm-btn" data-value="200">200</button>
+                <button class="prblm-btn" data-value="400">400</button>
+                <button class="prblm-btn" data-value="600">600</button>
+                <button class="prblm-btn" data-value="800">800</button>
+                <button class="prblm-btn" data-value="1000">1000</button>
+            </div>
+        </div>
+        <div id="player-points"></div>
+        <button id="final-jeopardy-btn" disabled>Final Jeopardy</button>
+    </div>
+    <div id="question-answer" style="display: none;">
+        <div id="q-category"></div>
+        <div id="q-difficulty"></div>
+        <div id="question-answer-txt"></div>
+        <div id="timer-bar"></div>
+        <select id="point-recipient"></select>
+        <button id="next-btn">Next</button>
+    </div>
+    <div id="end-screen" style="display: none;">
+        <div id="winner-container"></div>
+        <button id="new-game-btn">New Game</button>
+    </div>
+    <script src="assets/script.js"></script>
+</body>
+</html>

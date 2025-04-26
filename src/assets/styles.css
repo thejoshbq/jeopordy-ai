@@ -1,0 +1,529 @@
+/* Reset default styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background-color: #000066; /* Jeopardy dark blue */
+    color: #FFFFFF;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Setup Screen */
+#setup-screen {
+    background-color: rgba(0, 0, 102, 0.9); /* Darker blue with transparency */
+    padding: 2rem;
+    border-radius: 10px;
+    max-width: 600px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+#setup-screen h1 {
+    color: #FFD700; /* Gold */
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+}
+
+#setup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+#setup-form label {
+    font-size: 1.2rem;
+    color: #FFD700;
+}
+
+#setup-form input[type="text"],
+#setup-form select {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    background-color: #FFFFFF;
+    color: #000000;
+    width: 100%;
+}
+
+#setup-form input[type="radio"] {
+    margin: 0.5rem;
+}
+
+#teams-container,
+#players-container {
+    background-color: #000033;
+    padding: 1rem;
+    border-radius: 5px;
+    margin: 1rem 0;
+}
+
+#teams-container h3,
+#players-container h3 {
+    color: #FFD700;
+    margin-bottom: 0.5rem;
+}
+
+.team-entry,
+.player-entry {
+    margin: 1rem 0;
+}
+
+.team-entry h4 {
+    color: #FFD700;
+    margin-bottom: 0.5rem;
+}
+
+.team-name-input,
+.player-name-input,
+.member-name-input {
+    margin: 0.3rem 0;
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+}
+
+.members-container {
+    margin-top: 0.5rem;
+}
+
+.add-team-btn,
+.add-player-btn,
+.add-member-btn,
+.remove-team-btn,
+.remove-player-btn,
+#generate-questions-btn {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    background-color: #FFD700;
+    color: #000066;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0.3rem;
+}
+
+.add-team-btn:hover,
+.add-player-btn:hover,
+.add-member-btn:hover,
+.remove-team-btn:hover,
+.remove-player-btn:hover,
+#generate-questions-btn:hover:not(.pressed):not(:disabled) {
+    background-color: #FFCC00;
+    transform: scale(1.05);
+}
+
+#generate-questions-btn.pressed {
+    background-color: #CCAA00;
+    transform: scale(0.95);
+    cursor: wait;
+}
+
+#generate-questions-btn:disabled {
+    background-color: #666666;
+    cursor: not-allowed;
+}
+
+.loading-ring {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #FFFFFF;
+    border-radius: 50%;
+    border-top-color: #FFD700;
+    animation: spin 1s linear infinite;
+    margin-right: 0.5rem;
+}
+
+.loading-symbol {
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+    margin-right: 0.5rem;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+#error-message {
+    color: #FF3333;
+    font-size: 1rem;
+    margin-top: 1rem;
+}
+
+/* Starting Screen */
+#starting-screen {
+    text-align: center;
+    background-color: rgba(0, 0, 102, 0.9);
+    padding: 2rem;
+    border-radius: 10px;
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+#starting-screen img {
+    max-width: 100%;
+    width: 300px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+#starting-screen p {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+}
+
+#start-game-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 5px;
+    background-color: #FFD700;
+    color: #000066;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#start-game-btn:hover {
+    background-color: #FFCC00;
+}
+
+/* Game Page */
+#app {
+    display: grid;
+    grid-template-areas:
+        "logo logo logo"
+        "current-player game-board player-points"
+        "current-player game-board final-jeopardy";
+    grid-template-columns: 1fr 4fr 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 1rem;
+    width: 100%;
+    max-width: 1200px;
+    padding: 1rem;
+    height: 100vh;
+    justify-items: center;
+}
+
+#game-logo {
+    grid-area: logo;
+    max-width: 100%;
+    width: 300px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+#current-player {
+    grid-area: current-player;
+    background-color: #000033;
+    padding: 1rem;
+    border-radius: 5px;
+    text-align: center;
+    color: #FFD700;
+    font-size: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#current-player span {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.categories {
+    grid-area: game-board;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    background-color: #000066;
+    padding: 0.5rem;
+    border: 2px solid #FFD700;
+    border-radius: 5px;
+}
+
+.category {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.category-header {
+    background-color: #000033;
+    color: #FFD700;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    padding: 0.5rem;
+    border: 1px solid #FFD700;
+    text-transform: uppercase;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.prblm-btn {
+    background-color: #000033;
+    color: #FFD700;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border: 1px solid #FFD700;
+    padding: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.prblm-btn:hover:not(:disabled) {
+    background-color: #FFCC00;
+    color: #000066;
+    transform: scale(1.05);
+}
+
+.prblm-btn:disabled {
+    background-color: #333333;
+    color: #666666;
+    text-decoration: line-through;
+    cursor: not-allowed;
+}
+
+#player-points {
+    grid-area: player-points;
+    background-color: #000033;
+    padding: 1rem;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.user-points {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #FFD700;
+    font-size: 1.1rem;
+}
+
+.player-name-container {
+    flex: 1;
+}
+
+.user-point {
+    font-weight: bold;
+}
+
+#final-jeopardy-btn {
+    grid-area: final-jeopardy;
+    padding: 0.75rem;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 5px;
+    background-color: #FFD700;
+    color: #000066;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    align-self: start;
+}
+
+#final-jeopardy-btn:disabled {
+    background-color: #666666;
+    cursor: not-allowed;
+}
+
+#final-jeopardy-btn:hover:not(:disabled) {
+    background-color: #FFCC00;
+}
+
+/* Question Popup */
+#question-answer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 102, 0.95);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+#q-category {
+    color: #FFD700;
+    font-size: 2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+
+#q-difficulty {
+    color: #FFD700;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+#question-answer-txt {
+    color: #FFFFFF;
+    font-size: 1.8rem;
+    text-align: center;
+    max-width: 80%;
+    margin-bottom: 1rem;
+}
+
+#timer-bar {
+    width: 50%;
+    height: 10px;
+    background-color: #333333;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+#timer-bar::before {
+    content: '';
+    display: block;
+    height: 100%;
+    background-color: #FFD700;
+    width: 100%;
+    transition: width linear;
+}
+
+#point-recipient {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border-radius: 5px;
+    background-color: #FFFFFF;
+    color: #000066;
+    margin-bottom: 1rem;
+}
+
+#next-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 5px;
+    background-color: #FFD700;
+    color: #000066;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#next-btn:hover {
+    background-color: #FFCC00;
+}
+
+/* End Screen */
+#end-screen {
+    text-align: center;
+    background-color: rgba(0, 0, 102, 0.9);
+    padding: 2rem;
+    border-radius: 10px;
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+#end-screen h2 {
+    color: #FFD700;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+#end-screen p {
+    font-size: 1.2rem;
+    margin: 0.5rem 0;
+}
+
+#new-game-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 5px;
+    background-color: #FFD700;
+    color: #000066;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 1rem;
+}
+
+#new-game-btn:hover {
+    background-color: #FFCC00;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    #app {
+        grid-template-areas:
+            "logo"
+            "current-player"
+            "game-board"
+            "player-points"
+            "final-jeopardy";
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto auto auto;
+    }
+
+    .categories {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .category-header {
+        font-size: 1rem;
+    }
+
+    .prblm-btn {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .categories {
+        grid-template-columns: 1fr;
+    }
+
+    #setup-screen,
+    #starting-screen,
+    #end-screen {
+        width: 95%;
+        padding: 1rem;
+    }
+
+    #starting-screen img,
+    #game-logo {
+        width: 200px; /* Smaller logo on mobile */
+    }
+
+    #question-answer-txt {
+        font-size: 1.4rem;
+        max-width: 90%;
+    }
+}
