@@ -32,7 +32,6 @@ let isGeneratingQuestions = false;
 const TOGETHER_API_URL = "https://api.together.xyz/v1/chat/completions";
 let apiKey = "";
 
-// Game Mode Selection
 gameModeRadios.forEach(radio => {
     radio.addEventListener('change', () => {
         gameMode = radio.value;
@@ -45,7 +44,6 @@ gameModeRadios.forEach(radio => {
     });
 });
 
-// Dynamic Team/Player Management
 let teamCount = 0;
 let playerCount = 0;
 
@@ -114,7 +112,6 @@ document.addEventListener("click", (e) => {
     }
 });
 
-// Setup Form Submission
 generateQuestionsBtn.addEventListener("click", async (e) => {
     e.preventDefault();
     if (isGeneratingQuestions) {
@@ -124,7 +121,6 @@ generateQuestionsBtn.addEventListener("click", async (e) => {
     isGeneratingQuestions = true;
     errorMessage.style.display = "none";
 
-    // Show loading state
     generateQuestionsBtn.classList.add('pressed');
     generateQuestionsBtn.disabled = true;
     generateQuestionsBtn.innerHTML = '<span class="loading-ring"></span><img src="assets/jeopardy-logo.png" class="loading-symbol" alt="Loading"> Generating...';
@@ -204,11 +200,9 @@ function resetButtonState() {
     isGeneratingQuestions = false;
 }
 
-// findValidJson function
 function findValidJson(content, expectedType = 'array') {
     console.log('Searching for valid JSON in response:', content);
 
-    // Helper function to attempt JSON parsing safely
     const tryParseJson = (str) => {
         try {
             const json = JSON.parse(str.trim());
@@ -226,11 +220,10 @@ function findValidJson(content, expectedType = 'array') {
         return null;
     };
 
-    // Try common code fences
     const codeFenceRegexes = [
         /```(?:json)?\n([\s\S]*?)\n```/,
         /'''(?:json)?\n([\s\S]*?)\n'''/,
-        /```\n([\s\S]*?)\n```/, // Fallback for plain code fences
+        /```\n([\s\S]*?)\n```/, // fallback for plain code fences
     ];
     for (const regex of codeFenceRegexes) {
         const match = content.match(regex);
@@ -240,13 +233,11 @@ function findValidJson(content, expectedType = 'array') {
         }
     }
 
-    // Clean up common issues (e.g., trailing commas, unclosed brackets)
     let cleanedContent = content
-        .replace(/,\s*([\]}])/g, '$1') // Remove trailing commas
-        .replace(/[\n\r]+/g, '') // Remove newlines
+        .replace(/,\s*([\]}])/g, '$1') 
+        .replace(/[\n\r]+/g, '')
         .trim();
 
-    // Search for valid JSON object or array
     const stack = [];
     let startIndex = -1;
     for (let i = 0; i < cleanedContent.length; i++) {
@@ -270,14 +261,12 @@ function findValidJson(content, expectedType = 'array') {
         }
     }
 
-    // Try parsing the entire cleaned content as a last resort
     const json = tryParseJson(cleanedContent);
     if (json) return json;
 
     throw new Error('No valid JSON found in response');
 }
 
-// generateQuestions function
 async function generateQuestions(topics, tonality, mode) {
     const prompt = `
         You are a JSON generator for a Jeopardy game. Return *only* a valid JSON array containing exactly 4 categories. Each category must be an object with:
@@ -334,7 +323,6 @@ async function generateQuestions(topics, tonality, mode) {
     }
 }
 
-// generateFinalJeopardy function
 async function generateFinalJeopardy(topics) {
     const prompt = `
         You are a JSON generator for a Jeopardy game. Return *only* a valid JSON object for a Final Jeopardy question. The object must include:
@@ -380,7 +368,6 @@ async function generateFinalJeopardy(topics) {
     }
 }
 
-// Start Game
 document.getElementById("start-game-btn").addEventListener("click", () => {
     console.log("Starting game, transitioning to main app");
     startingScreen.style.display = "none";
@@ -391,7 +378,6 @@ document.getElementById("start-game-btn").addEventListener("click", () => {
     document.getElementById("current-player").innerHTML = `Current ${gameMode === 'team' ? 'team' : 'player'}: <br><span>${currentEntityTurn}</span>`;
 });
 
-// Populate Headers
 function populateCategoryHeaders() {
     console.log("Populating category headers");
     questionsData = JSON.parse(localStorage.getItem("questions") || "[]");
@@ -410,7 +396,6 @@ function populateCategoryHeaders() {
     });
 }
 
-// Question Handling
 problemButtons.forEach(button => {
     button.addEventListener("click", function () {
         console.log(`Clicked button: ${this.dataset.value} in category ${this.parentElement.id}`);
@@ -475,7 +460,6 @@ function awardPoints(question, categoryName) {
         return;
     }
 
-    // Update score
     const entity = entities[selectedIndex];
     entity.score += parseInt(userDifficultyChoice);
     console.log(`Updated score for ${entity.name}: ${entity.score}`);
@@ -511,7 +495,6 @@ function displayEntities() {
     });
 }
 
-// Timer
 function startCountdown(countdownTime) {
     console.log("Starting countdown:", countdownTime);
     const timerBar = document.getElementById("timer-bar");
@@ -527,15 +510,13 @@ function startCountdown(countdownTime) {
     }, 5);
 }
 
-// Final Jeopardy Handling with Wagering
 finalJeopardyBtn.addEventListener("click", async () => {
     console.log("Final Jeopardy button clicked");
-    finalJeopardyBtn.disabled = true; // Prevent multiple clicks
-    mainApp.style.display = "none"; // Hide main game board
-    popUp.style.display = "block"; // Show question popup
+    finalJeopardyBtn.disabled = true;
+    mainApp.style.display = "none";
+    popUp.style.display = "block"; 
 
     try {
-        // Step 1: Collect wagers
         qCategory.textContent = "Final Jeopardy";
         qDifficulty.textContent = "Wagering";
         problemTxt.innerHTML = `
@@ -548,11 +529,10 @@ finalJeopardyBtn.addEventListener("click", async () => {
             `).join('')}
         `;
         const pointRecipient = document.getElementById("point-recipient");
-        pointRecipient.style.display = "none"; // Hide recipient dropdown
+        pointRecipient.style.display = "none"; 
         const nextBtn = document.getElementById("next-btn");
         nextBtn.textContent = "Submit Wagers";
         nextBtn.onclick = async () => {
-            // Validate and store wagers
             const wagerInputs = document.querySelectorAll(".wager-input");
             const wagers = {};
             let valid = true;
@@ -570,7 +550,6 @@ finalJeopardyBtn.addEventListener("click", async () => {
             });
             if (!valid) return;
 
-            // Step 2: Fetch and display Final Jeopardy question
             const topics = JSON.parse(localStorage.getItem("questions") || "[]").map(cat => cat.name);
             const finalQuestion = await generateFinalJeopardy(topics);
             console.log("Final Jeopardy question:", finalQuestion);
@@ -581,7 +560,6 @@ finalJeopardyBtn.addEventListener("click", async () => {
             pointRecipient.style.display = "none";
             nextBtn.textContent = "See Answer";
             nextBtn.onclick = () => {
-                // Step 3: Show answer and collect answer correctness
                 problemTxt.textContent = finalQuestion.answer || "Error: Answer not found.";
                 problemTxt.innerHTML += `
                     <h3>Did each ${gameMode === 'team' ? 'team' : 'player'} answer correctly?</h3>
@@ -595,44 +573,39 @@ finalJeopardyBtn.addEventListener("click", async () => {
                 `;
                 nextBtn.textContent = "Award Points";
                 nextBtn.onclick = () => {
-                    // Step 4: Award points based on wagers and correctness
                     const correctAnswers = document.querySelectorAll(".correct-answer");
                     correctAnswers.forEach(checkbox => {
                         const index = checkbox.dataset.entityIndex;
                         const entity = entities[index];
                         const wager = wagers[index];
                         if (checkbox.checked) {
-                            entity.score += wager; // Add wager for correct answer
+                            entity.score += wager; 
                             console.log(`Awarded ${wager} points to ${entity.name}. New score: ${entity.score}`);
                         } else {
-                            entity.score -= wager; // Subtract wager for incorrect answer
+                            entity.score -= wager; 
                             console.log(`Deducted ${wager} points from ${entity.name}. New score: ${entity.score}`);
                         }
                     });
 
-                    // Update display and save game
                     displayEntities();
                     saveGame();
 
-                    // Step 5: End the game
                     popUp.style.display = "none";
                     showEndScreen();
                 };
             };
-            startCountdown(60); // Start timer for answering
+            startCountdown(60);
         };
-        startCountdown(30); // Timer for wagering
     } catch (error) {
         console.error("Error in Final Jeopardy:", error);
         errorMessage.textContent = `Error: ${error.message}`;
         errorMessage.style.display = "block";
         popUp.style.display = "none";
         mainApp.style.display = "grid";
-        finalJeopardyBtn.disabled = false; // Re-enable button on error
+        finalJeopardyBtn.disabled = false; 
     }
 });
 
-// End Screen
 function showEndScreen() {
     console.log("Showing end screen");
     popUp.style.display = "none";
@@ -652,7 +625,6 @@ function showEndScreen() {
     });
 }
 
-// Save Game Data
 function saveGame() {
     console.log("Saving game data:", entities);
     localStorage.setItem('entities', JSON.stringify(entities));
