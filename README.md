@@ -7,7 +7,7 @@
 
 [![](https://img.shields.io/badge/@thejoshbq-grey?style=for-the-badge&logo=github)](https://github.com/thejoshbq) [![](https://img.shields.io/badge/@thejoshbq-grey?style=for-the-badge&logo=X)](https://x.com/thejoshbq) 
 
-[![](https://img.shields.io/badge/Play-Online-blue?style=for-the-badge)](https://thejoshbq.github.io/jeopardy-ai)
+[![](https://img.shields.io/badge/Play-Online-blue?style=for-the-badge)](https://thejoshbq.github.io/jeopardy-ai/)
  
 <br>
 
